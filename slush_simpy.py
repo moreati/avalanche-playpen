@@ -40,6 +40,8 @@ class Node:
             if self.color == Color.UNCOLORED:
                 yield self.env.timeout(1)
                 continue
+            # TODO Does node n always get scheduled before n+1?
+            # TODO Does that affect the outcome? How?
             contacts = random.sample(set(nodes).difference({self}), sample_size)
             replies = [contact.on_query(self.color) for contact in contacts]
 
