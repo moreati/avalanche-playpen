@@ -16,6 +16,10 @@ sample_size = 5     # k in the whitepaper
 sample_threshold = 0.6     # α in the whitepaper
 
 
+assert sample_size < num_nodes
+assert 0.5 < sample_threshold < 1.0
+
+
 class Color(enum.Enum):
     UNCOLORED = 0
     RED = 1
