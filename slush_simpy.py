@@ -13,7 +13,7 @@ import simpy
 num_rounds = 100    # m in the whitepaper
 num_nodes = 100     # n in the whitepaper
 sample_size = 5     # k in the whitepaper
-threshold = 0.6     # α in the whitepaper
+sample_threshold = 0.6     # α in the whitepaper
 
 
 class Color(enum.Enum):
@@ -46,7 +46,7 @@ class SlushNode:
             replies = [contact.on_query(self.color) for contact in contacts]
 
             for color in [Color.RED, Color.BLUE]:
-                if replies.count(color) > threshold * sample_size:
+                if replies.count(color) > sample_threshold * sample_size:
                     self.color = color
             yield self.env.timeout(1)
 
