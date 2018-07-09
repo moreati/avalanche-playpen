@@ -59,6 +59,7 @@ class SlushNode:
             for color in [Color.RED, Color.BLUE]:
                 if replies.count(color) > sample_threshold * sample_size:
                     self.color = color
+                    break
             yield self.env.timeout(1)
 
 
