@@ -63,22 +63,36 @@ class SlushNode:
             yield self.env.timeout(1)
 
 
-def display_color(node):
-    return ['black', 'red', 'blue'][node.color.value]
+def display_color(color_value):
+    return ['black', 'red', 'blue'][color_value]
 
 
 def monitor(env, nodes):
     # TODO Does this run at the end of a step? beginning? indeterminate?
     assert len(nodes) % 2 == 0, "Odd number of nodes won't render correctly"
+    sep = curtsies.fmtstr('')
+    cells = {
+        (0, 0): curtsies.fmtstr('▀', fg=display_color(0), bg=display_color(0)),
+        (0, 1): curtsies.fmtstr('▀', fg=display_color(0), bg=display_color(1)),
+        (0, 2): curtsies.fmtstr('▀', fg=display_color(0), bg=display_color(2)),
+        (1, 0): curtsies.fmtstr('▀', fg=display_color(1), bg=display_color(0)),
+        (1, 1): curtsies.fmtstr('▀', fg=display_color(1), bg=display_color(1)),
+        (1, 2): curtsies.fmtstr('▀', fg=display_color(1), bg=display_color(2)),
+        (2, 0): curtsies.fmtstr('▀', fg=display_color(2), bg=display_color(0)),
+        (2, 1): curtsies.fmtstr('▀', fg=display_color(2), bg=display_color(1)),
+        (2, 2): curtsies.fmtstr('▀', fg=display_color(2), bg=display_color(2)),
+    }
     with curtsies.CursorAwareWindow() as win:
+        chunks = list(chunk(nodes, win.width*2))
+        vis = curtsies.FSArray(len(chunks), win.width)
         while True:
-            chunks = list(chunk(nodes, win.width*2))
-            vis = curtsies.FSArray(len(chunks), win.width*2)
             for i, row in enumerate(chunks):
-                for j in range(0, len(row), 2):
-                    fg = display_color(row[j])
-                    bg = display_color(row[j+1])
-                    vis[i, j//2] = curtsies.fmtstr('▀', fg=fg, bg=bg)
+                line = [
+                    cells[row[j].color.value, row[j+1].color.value]
+                    for j in range(0, len(row), 2)
+                ]
+                line = sep.join(line)
+                vis[i] = line
             win.render_to_terminal(vis)
             yield env.timeout(delay=1)
 
