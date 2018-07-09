@@ -86,10 +86,6 @@ if __name__ == '__main__':
     env = simpy.rt.RealtimeEnvironment()
     initial_colors = [Color(random.randint(0, 2)) for i in range(num_nodes)]
     nodes = [SlushNode(env, color) for color in initial_colors]
-    #print('BEGIN')
-    #print(''.join('%i' % node.color.value for node in nodes))
     procs = [env.process(node.run(nodes, sample_size)) for node in nodes]
     env.process(monitor(env, nodes))
     env.run(until=num_rounds)
-    #print('END')
-    #print(''.join('%i' % node.color.value for node in nodes))
