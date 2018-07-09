@@ -12,8 +12,8 @@ import simpy
 #  B  set of byzantine node     b  number of byzantine nodes
 #  N  set of all nodes          n  number of nodes
 
-num_rounds = 100    # m in the whitepaper
-num_nodes = 100     # n in the whitepaper
+num_rounds = 20    # m in the whitepaper
+num_nodes = 2000     # n in the whitepaper
 sample_size = 5     # k in the whitepaper
 sample_threshold = 0.6     # α in the whitepaper
 
