@@ -46,14 +46,14 @@ class SlushNode:
     def accept(self):
         return self.color
 
-    def run(self, nodes, sample_size):
+    def run(self, other_nodes, sample_size):
         while True:
             if self.color == Color.UNCOLORED:
                 yield self.env.timeout(1)
                 continue
             # TODO Does node n always get scheduled before n+1?
             # TODO Does that affect the outcome? How?
-            contacts = random.sample(set(nodes).difference({self}), sample_size)
+            contacts = random.sample(other_nodes, sample_size)
             replies = [contact.on_query(self.color) for contact in contacts]
 
             for color in [Color.RED, Color.BLUE]:
@@ -86,6 +86,6 @@ if __name__ == '__main__':
     env = simpy.rt.RealtimeEnvironment()
     initial_colors = [Color(random.randint(0, 2)) for i in range(num_nodes)]
     nodes = [SlushNode(env, color) for color in initial_colors]
-    procs = [env.process(node.run(nodes, sample_size)) for node in nodes]
+    procs = [env.process(node.run(tuple(set(nodes).difference({node})), sample_size)) for node in nodes]
     env.process(monitor(env, nodes))
     env.run(until=num_rounds)
