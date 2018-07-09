@@ -22,9 +22,9 @@ assert sample_size < num_nodes
 assert 0.5 < sample_threshold < 1.0
 
 
-def grouper(n, iterable, padvalue=None):
-    "grouper(3, 'abcdefg', 'x') --> ('a','b','c'), ('d','e','f'), ('g','x','x')"
-    return itertools.zip_longest(*[iter(iterable)]*n, fillvalue=padvalue)
+def chunk(it, size):
+    it = iter(it)
+    return iter(lambda: tuple(itertools.islice(it, size)), ())
 
 
 class Color(enum.Enum):
@@ -62,21 +62,22 @@ class SlushNode:
             yield self.env.timeout(1)
 
 
-def node_portrayal(node):
-    bg = ['black', 'red', 'blue'][node.color.value]
-    return curtsies.fmtstr(' ', bg=bg)
+def display_color(node):
+    return ['black', 'red', 'blue'][node.color.value]
 
 
 def monitor(env, nodes):
     # TODO Does this run at the end of a step? beginning? indeterminate?
+    assert len(nodes) % 2 == 0, "Odd number of nodes won't render correctly"
     with curtsies.CursorAwareWindow() as win:
         while True:
-            lines = grouper(win.width, nodes)
-            vis = curtsies.fsarray([
-                curtsies.fmtstr('').join(
-                    node_portrayal(node) for node in line if node)
-                for line in lines
-            ])
+            chunks = list(chunk(nodes, win.width*2))
+            vis = curtsies.FSArray(len(chunks), win.width*2)
+            for i, row in enumerate(chunks):
+                for j in range(0, len(row), 2):
+                    fg = display_color(row[j])
+                    bg = display_color(row[j+1])
+                    vis[i, j//2] = curtsies.fmtstr('▀', fg=fg, bg=bg)
             win.render_to_terminal(vis)
             yield env.timeout(delay=1)
 
